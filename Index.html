@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Registro y Agregar Foto</title>
+
+<style>
+:root {
+  --bg1:#0b0b10;
+  --bg2:#141420;
+  --glass:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.12);
+  --text:#f9fafb;
+  --muted:#9ca3af;
+  --accent:#6366f1;
+}
+
+* {
+  box-sizing:border-box;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+}
+
+body {
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(1000px at top, #1c1c3a, transparent 60%),
+    linear-gradient(180deg,var(--bg1),var(--bg2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--text);
+}
+
+.card, .app {
+  width:100%;
+  max-width:420px;
+}
+
+.card {
+  padding:32px 26px 28px;
+  border-radius:26px;
+  background:linear-gradient(
+    180deg,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.02)
+  );
+  backdrop-filter:blur(18px);
+  border:1px solid var(--border);
+  box-shadow:0 30px 80px rgba(0,0,0,.55);
+  position:relative;
+  animation:fadeUp .6s ease;
+}
+
+@keyframes fadeUp {
+  from {opacity:0; transform:translateY(16px);}
+  to {opacity:1; transform:translateY(0);}
+}
+
+h1 {
+  margin:0 0 18px;
+  font-size:26px;
+  font-weight:700;
+  letter-spacing:-0.4px;
+}
+
+input, textarea {
+  width:100%;
+  padding:16px 18px;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:var(--glass);
+  color:var(--text);
+  font-size:16px;
+  outline:none;
+}
+
+input::placeholder, textarea::placeholder {
+  color:var(--muted);
+}
+
+textarea {
+  margin-top:16px;
+  min-height:100px;
+  resize:none;
+}
+
+.footer {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:26px;
+}
+
+.step {
+  font-size:14px;
+  color:var(--muted);
+}
+
+.next {
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+  background:linear-gradient(135deg,#6366f1,#818cf8);
+  color:white;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 8px 24px rgba(99,102,241,.45);
+  transition:transform .15s ease;
+}
+
+.next:active {
+  transform:scale(.94);
+}
+
+.success {
+  text-align:center;
+  font-size:20px;
+  font-weight:600;
+  animation:fadeUp .5s ease;
+}
+
+/* Estilos de la interfaz de foto */
+.app {
+  display:none;
+  padding:18px;
+}
+
+/* Área de foto única */
+.photo-area {
+  width:100%;
+  aspect-ratio:1/1;
+  border-radius:24px;
+  background:var(--glass);
+  border:1px dashed var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  cursor:pointer;
+  overflow:hidden;
+  position:relative;
+
+  /* Evitar el destello azul al tocar */
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.photo-area span {
+  color:var(--muted);
+  font-size:15px;
+}
+
+.photo-area img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.cta {
+  margin-top:20px;
+  width:100%;
+  padding:18px;
+  border:none;
+  border-radius:20px;
+  font-size:17px;
+  font-weight:700;
+  color:white;
+  background:linear-gradient(135deg,#6366f1,#818cf8);
+  box-shadow:0 12px 30px rgba(99,102,241,.45);
+}
+</style>
+</head>
+
+<body>
+
+<!-- Registro -->
+<div class="card" id="app">
+
+  <!-- Paso 1 -->
+  <div id="step1">
+    <h1>Usuario</h1>
+    <input id="username" placeholder="Escribí tu nombre de usuario" />
+    <div class="footer">
+      <div class="step">Paso 1 de 2</div>
+      <button class="next" onclick="goStep2()">→</button>
+    </div>
+  </div>
+
+  <!-- Paso 2 -->
+  <div id="step2" style="display:none">
+    <h1>Contraseña</h1>
+    <input id="password" type="password" placeholder="Escribí tu contraseña" />
+    <div class="footer">
+      <div class="step">Paso 2 de 2</div>
+      <button class="next" onclick="finish()">→</button>
+    </div>
+  </div>
+
+  <!-- Éxito -->
+  <div id="success" style="display:none">
+    <div class="success">Registro exitoso ✅</div>
+  </div>
+
+</div>
+
+<!-- Interfaz de foto -->
+<div class="app">
+  <input id="fileInput" type="file" accept="image/*" hidden />
+  <div class="photo-area" onclick="openGallery()">
+    <span id="photoText">Tocá para agregar una foto</span>
+  </div>
+  <textarea placeholder="Escribí una descripción..."></textarea>
+  <button class="cta">Continuar</button>
+</div>
+
+<script>
+/* Registro */
+function goStep2() {
+  const user = document.getElementById("username").value.trim();
+  if (!user) return alert("Ingresá un usuario");
+  document.getElementById("step1").style.display = "none";
+  document.getElementById("step2").style.display = "block";
+}
+
+function finish() {
+  const pass = document.getElementById("password").value.trim();
+  if (!pass) return alert("Ingresá una contraseña");
+  document.getElementById("step2").style.display = "none";
+  document.getElementById("success").style.display = "block";
+
+  // Después de 1 segundo, redirige a la interfaz de fotos
+  setTimeout(() => {
+    document.getElementById("app").style.display = "none";
+    document.querySelector(".app").style.display = "block";
+  }, 1000);
+}
+
+/* Interfaz de foto */
+let image = null; // solo 1 foto
+const input = document.getElementById("fileInput");
+const photoArea = document.querySelector(".photo-area");
+const text = document.getElementById("photoText");
+
+function openGallery() {
+  input.click();
+}
+
+input.addEventListener("change", () => {
+  if (input.files.length === 0) return;
+  image = input.files[0];
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    photoArea.innerHTML = `<img src="${e.target.result}">`;
+  };
+  reader.readAsDataURL(image);
+});
+</script>
+
+</body>
+</html>

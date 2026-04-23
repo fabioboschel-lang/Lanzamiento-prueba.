@@ -1,16 +1,19 @@
 import { supabase } from "./supabase.js";
-
+import { navigate } from "./app.js";
 export async function FeedView(app) {
   console.log("🚀 FeedView iniciado");
 
   app.innerHTML = `
+    
+    
     <div class="feed-container">
       <div id="imagesGrid" class="imagesGrid"></div>
     </div>
+    
   `;
 
   const imagesGrid = document.getElementById("imagesGrid");
-  const BATCH_SIZE = 30;
+  const BATCH_SIZE = 5;
   const currentUserId = localStorage.getItem("user_id");
 
   if (!currentUserId) {
@@ -84,6 +87,9 @@ export async function FeedView(app) {
         estado3 = true;
         textoFinal = filaEstado3.A3;
         wrapper.dataset.estado3 = "true";
+      
+        wrapper.appendChild(crearChatBtn(post.user_id));
+        
       } else {
         // 🟡 ESTADO 2
         const filaEstado2 = relaciones.find(
@@ -222,8 +228,12 @@ const post = btn.closest(".post");
 
       btn.classList.remove("like-inactivo");
       btn.classList.add("like-bloqueado");
-      post.dataset.estado2 = "false";
-      post.dataset.estado3 = "true";
+     post.dataset.estado2 = "false";
+post.dataset.estado3 = "true";
+
+if (!post.querySelector(".chat-go-btn")) {
+  post.appendChild(crearChatBtn(destinatario));
+}
 
       const textDiv = post.querySelector(".post-text");
       if (textDiv && filas[0].A3) {
@@ -319,7 +329,11 @@ document.addEventListener("dblclick", async (e) => {
         btn.classList.remove("like-inactivo", "like-activo");
         btn.classList.add("like-bloqueado");
         wrapper.dataset.estado2 = "false";
-        wrapper.dataset.estado3 = "true";
+wrapper.dataset.estado3 = "true";
+
+if (!wrapper.querySelector(".chat-go-btn")) {
+  wrapper.appendChild(crearChatBtn(destinatario));
+}
 
         if (textDiv && filas[0].A3) {
           textDiv.textContent = filas[0].A3;
@@ -343,7 +357,36 @@ document.addEventListener("dblclick", async (e) => {
 
 
 
+function crearChatBtn(userId) {
+  const btn = document.createElement("div");
+  btn.className = "chat-go-btn";
 
+  btn.innerHTML = `
+  <svg viewBox="0 0 100 100">
+    <path d="
+      M10 47
+      Q10 43 15 41
+      L83 13
+      Q92 9 90 18
+      L78 82
+      Q76 91 68 85
+      L41 61
+      L73 32
+      Q76 29 73 28
+      L31 55
+      L15 50
+      Q10 49 10 47
+      Z
+    " fill="white"/>
+  </svg>
+  `;
+
+  btn.addEventListener("click", () => {
+    navigate("chat", { userId });
+  });
+
+  return btn;
+}
 
 
 
@@ -363,45 +406,94 @@ document.addEventListener("dblclick", async (e) => {
 function crearBigHeart(wrapper, img, e) {
   const rect = img.getBoundingClientRect();
 
-  // 🔹 Punto inicial: justo donde se hizo el doble tap
+  // 🔹 Punto exacto del toque
   const xStart = e.clientX - rect.left;
-  const yStart = e.clientY - rect.top ;
+  const yStart = e.clientY - rect.top;
 
-  // 🔹 Posición final: unos píxeles arriba del toque (disparo hacia arriba)
-  const xEnd = xStart - 50;      
-  const yEnd = yStart - 200; // ajustar píxeles hacia arriba según gusto
+  // 🔹 Destino: recto hacia arriba
+  const xEnd = xStart;
+  const yEnd = yStart - 150;
 
   const bigHeart = document.createElement("div");
   bigHeart.classList.add("bigHeartEffect");
-  // Lo posicionamos en el punto inicial
+
+  // 🔹 Posición exacta del toque
   bigHeart.style.left = `${xStart}px`;
   bigHeart.style.top = `${yStart}px`;
 
-  // 🔹 Combinaciones de gradientes optimizadas
-  const gradients = [
-    ["#FF0000", "#FFA500"],   // rojo → naranja
-    ["#FF0000", "#FF69B4"],   // rojo → rosa
-    ["#FF69B4", "#8A2BE2"],   // rosa → violeta
-    ["#8A2BE2", "#FF00FF"],   // violeta → magenta
-    ["#FFA500", "#FF69B4"],   // naranja → rosa
-    ["#FF00FF", "#FF4500"],   // magenta → rojo
-    ["#FF0000", "#FF7F50"],   // rojo → coral
-    ["#FF69B4", "#FF7F50"],   // rosa → coral
-    ["#8A2BE2", "#1E90FF"],   // violeta → azul
-    ["#1E90FF", "#00FFFF"]    // azul → celeste
-  ];
+  // 🔹 Gradientes
+// =========================
+// 🎨 SISTEMA DE RAREZA HEART
+// =========================
 
-  // Direcciones posibles de gradiente
-  const directions = [
-    ["0%", "0%", "0%", "100%"],  // arriba → abajo
-    ["0%", "100%", "0%", "0%"],  // abajo → arriba
-    ["0%", "0%", "100%", "0%"],  // izquierda → derecha
-    ["100%", "0%", "0%", "0%"]   // derecha → izquierda
-  ];
+// 🔹 Comunes (70%)
+const commonGradients = [
+["#FF1744", "#FF4D6D"],  // rojo vivo
+["#FF4FD8", "#C400FF"],  // rosa neón
+["#00E5FF", "#2979FF"]   // cyan azul
+];
 
-  const gradientColors = gradients[Math.floor(Math.random() * gradients.length)];
-  const dir = directions[Math.floor(Math.random() * directions.length)];
-  const gradientId = "gradientHeart-" + Date.now();
+// 🔹 Especiales (25%)
+const specialGradients = [
+["#FFD600", "#FF9100"] ,  // oro fuego
+["#7C4DFF", "#E040FB"] ,  // violeta premium
+["#FFFFFF", "#F2F2F2"],
+["#69F0AE", "#00E676"]   // verde neón raro
+];
+
+// 🔹 Legendario (5%)
+const legendaryGradients = [
+["#FF2DAA", "#7A5CFF", "#00E5FF"], // rosa → violeta → cyan (tricolor energía)
+  ["#FF0055", "#FFB300", "#FFFFFF"],  // rojo → oro → blanco (impacto premium)
+  ["#9D00FF", "#FF3D81", "#00FFC8"],  // neón híbrido (muy moderno)
+];
+
+// =========================
+// 🎲 Sorteo de rareza
+// =========================
+
+const roll = Math.random();
+let gradientsPool;
+
+if (roll < 0.70) {
+  gradientsPool = commonGradients;       // 70%
+} else if (roll < 0.95) {
+  gradientsPool = specialGradients;     // 25%
+} else {
+  gradientsPool = legendaryGradients;   // 5%
+}
+
+// Elegir gradient final
+const gradientColors =
+  gradientsPool[Math.floor(Math.random() * gradientsPool.length)];
+
+
+// =========================
+// ↕️ DIRECCIONES
+// =========================
+
+const directions = [
+  ["0%", "0%", "0%", "100%"],   // arriba → abajo
+  ["0%", "100%", "0%", "0%"],   // abajo → arriba
+  ["0%", "0%", "100%", "0%"],   // izquierda → derecha
+  ["100%", "0%", "0%", "0%"]    // derecha → izquierda
+];
+
+const dir =
+  directions[Math.floor(Math.random() * directions.length)];
+
+
+// ID único gradient
+const gradientId =
+  "gradientHeart-" + Date.now() + "-" + Math.floor(Math.random() * 99999);
+
+const finalRotations = [-10, 0, 10]; // izquierda, recto, derecha
+const finalRotation = finalRotations[Math.floor(Math.random() * finalRotations.length)];
+
+const size = 125;
+  const half = size / 2;
+
+  
 
   bigHeart.innerHTML = `
     <svg viewBox="0 0 512 512">
@@ -418,45 +510,86 @@ function crearBigHeart(wrapper, img, e) {
   wrapper.appendChild(bigHeart);
   void bigHeart.offsetWidth;
 
-  // 🔹 Animación: disparo desde el toque hacia arriba + vibración 20° + desaparición
-  // 🔹 Animación: disparo desde el toque hacia arriba + vibración 20° + estabilización
-// 🔹 Animación: vibración rápida + estabilización + desvanecimiento
 bigHeart.animate(
   [
-    { transform: `translate(px,px) scale(1) rotate(30deg)`, opacity: 0.5 },
-    // Disparo + inicio de vibración
-    { transform: `translate(${xEnd - xStart}px, ${yEnd - yStart}px) scale(1) rotate(-25deg)`, opacity: 1, offset: 0.05 },
-    { transform: `translate(${xEnd - xStart}px, ${yEnd - yStart}px) scale(1) rotate(20deg)`, offset: 0.1 },
-    { transform: `translate(${xEnd - xStart}px, ${yEnd - yStart}px) scale(1) rotate(-15deg)`, offset: 0.18 },
-    { transform: `translate(${xEnd - xStart}px, ${yEnd - yStart}px) scale(1) rotate(15deg)`, offset: 0.28 },
-    // 🔹 Fin de vibración y estabilización
-    { transform: `translate(${xEnd - xStart}px, ${yEnd - yStart}px) scale(1) rotate(0deg)`, opacity: 1, offset: 0.4 },
-    // 🔹 Tiempo estático restante hasta desvanecerse
-    { transform: `translate(${xEnd - xStart}px, ${yEnd - yStart}px) scale(1) rotate(0deg)`, opacity: 0.8, offset: 0.7 },
-    
-    
-         { transform: `translate(${xEnd - xStart}px, ${yEnd - yStart}px) scale(1) rotate(0deg)`, opacity: 0.6, offset: 0.8 },
-         
-         
-         
-     { transform: `translate(${xEnd - xStart}px, ${yEnd - yStart}px) scale(1) rotate(0deg)`, opacity: 0.4, offset: 0.9 },
-     
-      { transform: `translate(${xEnd - xStart}px, ${yEnd - yStart}px) scale(1) rotate(0deg)`, opacity: 0, offset: 1 }
-         
-         
-         
-    
+    {
+      transform: `translate(-${half}px, -${half}px) scale(0.55) rotate(18deg)`,
+      opacity: 0
+    },
 
+    {
+      transform: `translate(
+        ${(xEnd - xStart) * 0.18 - half}px,
+        ${(yEnd - yStart) * 0.18 - half}px
+      ) scale(0.82) rotate(12deg)`,
+      opacity: 0.65,
+      offset: 0.16
+    },
 
+    {
+      transform: `translate(
+        ${(xEnd - xStart) * 0.45 - half}px,
+        ${(yEnd - yStart) * 0.45 - half}px
+      ) scale(1.08) rotate(-10deg)`,
+      opacity: 1,
+      offset: 0.34
+    },
 
-       
-       
-         
+    {
+      transform: `translate(
+        ${(xEnd - xStart) * 0.72 - half}px,
+        ${(yEnd - yStart) * 0.72 - half}px
+      ) scale(1.15) rotate(8deg)`,
+      offset: 0.50
+    },
+
+    {
+      transform: `translate(
+        ${xEnd - xStart - half}px,
+        ${yEnd - yStart - half}px
+      ) scale(0.96) rotate(${finalRotation}deg)`,
+      offset: 0.64
+    },
+
+    {
+      transform: `translate(
+        ${xEnd - xStart - half}px,
+        ${yEnd - yStart - half}px
+      ) scale(1.04) rotate(${finalRotation * 0.6}deg)`,
+      offset: 0.72
+    },
+
+    {
+      transform: `translate(
+        ${xEnd - xStart - half}px,
+        ${yEnd - yStart - half}px
+      ) scale(1) rotate(${finalRotation}deg)`,
+      opacity: 1,
+      offset: 0.80
+    },
+
+    {
+      transform: `translate(
+        ${xEnd - xStart - half}px,
+        ${yEnd - yStart - half}px
+      ) scale(1) rotate(${finalRotation}deg)`,
+      opacity: 0.85,
+      offset: 0.92
+    },
+
+    {
+      transform: `translate(
+        ${xEnd - xStart - half}px,
+        ${yEnd - yStart - half - 18}px
+      ) scale(1.05) rotate(${finalRotation}deg)`,
+      opacity: 0,
+      offset: 1
+    }
   ],
   {
-    duration: 1500, // duración total sin cambiar
-    easing: "ease-out",
+    duration: 1900,
+    easing: "cubic-bezier(0.22, 1, 0.36, 1)",
     fill: "forwards"
   }
 );
-}
+        }

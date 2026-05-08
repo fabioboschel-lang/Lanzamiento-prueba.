@@ -1,10 +1,10 @@
 import { supabase } from "./supabase.js";
-import { navigate } from "./app.js";
+
 
 export function ProfileView(app) {
 
   app.innerHTML = `
-  <div class="container">
+  <div class="Container">
 
 <button class="cta" id="saveBtn">guardar</button>
 
@@ -22,14 +22,11 @@ export function ProfileView(app) {
 
     <input type="file" id="rectInput" accept="image/*">
     
-    <div class="back-arrow" id="backArrow">&#8592;</div>
+    
 
   </div>
   `;
-  const volver = document.getElementById("backArrow");
-  volver.addEventListener("click", () => {
-    navigate("mensajes");
-  });
+
   
   
   // Elementos

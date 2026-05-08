@@ -1,32 +1,44 @@
-.bigHeartEffect svg {
-  width: 100%;
-  height: 100%;
-  fill: url(#gradientHeart);
-  filter: drop-shadow(0 0 8px rgba(0,0,0,0.3));
+/* ========================= */
+/* ❤️ BIG HEART PREMIUM 2026 */
+/* ========================= */
+
+.bigHeartEffect{
+  position:absolute;
+  pointer-events:none;
+
+  width:120px;
+  height:120px;
+
+  z-index:999;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  /* centra exacto donde tocás */
+  transform:translate(-50%, -50%);
+
+  will-change:transform, opacity;
+
+  /* profundidad + glow */
+  filter:
+    drop-shadow(0 8px 18px rgba(0,0,0,.30))
+    drop-shadow(0 0 10px rgba(255,255,255,.16))
+    drop-shadow(0 0 22px rgba(255,70,140,.18));
 }
 
-.bigHeartEffect.show {
-  opacity: 1;
-  transform: translate(-50%, -65%) scale(1.2);
+.bigHeartEffect svg{
+  width:100%;
+  height:100%;
+  overflow:visible;
 }
 
-.bigHeartEffect {
-  position: absolute;
-  pointer-events: none;
-  width: 110px;
-  height: 110px;
-  z-index: 999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transform: translate(-50%, -50%) scale(0.3);
-  
-}
+/* borde brillante nítido */
 
 
 .like-btn {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
 
   position: absolute;
   bottom: 100px;

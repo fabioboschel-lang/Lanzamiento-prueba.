@@ -5,7 +5,7 @@ export async function Houseview(app) {
   console.log("🚀 Houseview iniciado");
 
   app.innerHTML = `
-  
+  <div class="entradasuave">
   <a href="https://mpago.la/21xn9GS" target="_blank" class="paybuttom">
     <h1 class="paytext">Obtener ticket</h1>
   </a>
@@ -16,10 +16,11 @@ export async function Houseview(app) {
   </div>
 
   <div class="Flyerbox">
-    <img id="flyerimg" class="flyerimg" src="" alt="Flyer del evento">
+    <img id="flyerimg" class="flyerimg" src="" alt="">
   </div>
 
   <div id="match-scroll" class="match-scroll"></div>
+  </div>
   `;
 
   console.log("✅ HTML renderizado");
@@ -107,9 +108,16 @@ async function loadFlyer() {
   const img = document.getElementById("flyerimg");
   console.log("📍 img element:", img);
 
-  if (img) img.src = publicData.publicUrl;
-}
+  if (!img) return;
 
+  img.classList.remove("loaded");
+
+  img.onload = () => {
+    img.classList.add("loaded");
+  };
+
+  img.src = publicData.publicUrl;
+}
 /* ===================== */
 /* 🔥 MATCHES */
 /* ===================== */

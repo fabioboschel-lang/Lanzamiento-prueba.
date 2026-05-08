@@ -22,15 +22,92 @@ export async function FeedView(app) {
   }
 
   try {
-    // 🔹 POSTS
-    const { data: posts, error: postsError } = await supabase
-      .from("posts")
-      .select("imagenPost, user_id")
-      .not("imagenPost", "is", null)
-      .order("updated_at", { ascending: false })
-      .limit(BATCH_SIZE);
 
-    if (postsError) throw postsError;
+  // =========================
+  // 🔹 1. OBTENER USER ACTUAL
+  // =========================
+
+  const currentUserId = localStorage.getItem("user_id");
+
+  // Buscar datos del usuario actual
+  const { data: currentUser, error: currentUserError } = await supabase
+    .from("posts")
+    .select("Sexo, Orientacion")
+    .eq("user_id", currentUserId)
+    .single();
+
+  if (currentUserError) throw currentUserError;
+
+  const mySexo = currentUser.Sexo;               // H o M
+  const myOrientacion = currentUser.Orientacion; // H M o X
+
+
+  // ==========================================
+  // 🔹 2. TRAER POSTS EXCLUYENDO EL PROPIO
+  // ==========================================
+
+  const { data: allPosts, error: postsError } = await supabase
+    .from("posts")
+    .select("imagenPost, user_id, Sexo, Orientacion, updated_at")
+    .not("imagenPost", "is", null)
+    .neq("user_id", currentUserId) // 👈 NO mostrarte a vos mismo
+    .order("updated_at", { ascending: false });
+
+  if (postsError) throw postsError;
+
+
+  // ==========================================
+  // 🔹 3. FILTRO:
+  // La otra persona debe:
+  //
+  // - buscar H o X si yo soy H
+  // - buscar M o X si yo soy M
+  //
+  // ==========================================
+
+  const compatibleByTheirOrientation = allPosts.filter(post => {
+
+    return (
+      post.Orientacion === "X" ||
+      post.Orientacion === mySexo
+    );
+
+  });
+
+
+  // ==========================================
+  // 🔹 4. FILTRO:
+  //
+  // Si yo busco:
+  // H -> solo Sexo H
+  // M -> solo Sexo M
+  // X -> ambos
+  //
+  // ==========================================
+
+  const finalPosts = compatibleByTheirOrientation.filter(post => {
+
+    // 👇 si yo busco ambos
+    if (myOrientacion === "X") {
+      return true;
+    }
+
+    // 👇 si busco H o M
+    return post.Sexo === myOrientacion;
+
+  });
+
+
+  // ==========================================
+  // 🔹 5. LIMITAR CANTIDAD FINAL
+  // ==========================================
+
+  const posts = finalPosts.slice(0, BATCH_SIZE);
+
+
+  console.log(posts);
+
+
 
     // 🔹 LIKES
     const { data: likes, error: likesError } = await supabase
@@ -487,10 +564,10 @@ const dir =
 const gradientId =
   "gradientHeart-" + Date.now() + "-" + Math.floor(Math.random() * 99999);
 
-const finalRotations = [-25,-12,0, 25,12]; // izquierda, recto, derecha
+const finalRotations = [-10, 0, 10]; // izquierda, recto, derecha
 const finalRotation = finalRotations[Math.floor(Math.random() * finalRotations.length)];
 
-const size = 110;
+const size = 120;
   const half = size / 2;
 
   
@@ -513,7 +590,7 @@ const size = 110;
 bigHeart.animate(
   [
     {
-      transform: `translate(-${half}px, -${half}px) scale(0.55) rotate(18deg)`,
+      transform: `translate(-${half}px, -${half}px) scale(0.55) rotate(0deg)`,
       opacity: 0
     },
 
@@ -592,4 +669,4 @@ bigHeart.animate(
     fill: "forwards"
   }
 );
-                          }
+}

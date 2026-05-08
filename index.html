@@ -20,7 +20,7 @@
   }
 
 body {
-  background: linear-gradient(-45deg, #2c2a4a, #4e457a, #7a4f72, #2c2a4a);
+  background: white;
   background-size: 400% 400%;
   animation: gradientBG 20s ease infinite;
   margin: 0;
@@ -192,10 +192,6 @@ position: relative;
   border-radius: 12px;
 }
 
-/* Bailarías.css */
-
-/* Estado 1 */
-/* Fondo animado */
 #splash-screen {
   position: fixed;
   top: 0;
@@ -303,10 +299,17 @@ position: relative;
   box-shadow: 0 15px 40px rgba(0,0,0,0.5);
 }
 
-.flyerimg {
+.flyerimg{
   width: 100%;
   height: 100%;
-  object-fit: cover;  /* 👈 esto elimina bordes negros */
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity .50s ease;
+  display: block;
+}
+
+.flyerimg.loaded{
+  opacity: 1;
 }
 </style>
 <link rel="stylesheet" href="./Bailarias.css">
@@ -325,6 +328,14 @@ position: relative;
 <link rel="stylesheet" href="./Mensajes.css">
 
 <link rel="stylesheet" href="./Profile.css">
+
+<link rel="stylesheet" href="./Avioncito.css">
+
+<link rel="stylesheet" href="./welcome.css">
+
+
+
+
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
 
 

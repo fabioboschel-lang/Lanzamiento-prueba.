@@ -4,20 +4,14 @@ import { navigate } from "./app.js";
 export async function Mensajes(app) {
 
   app.innerHTML = `
+   <div class ="suavemensajes">
+   
+    <div class="mensajes-header">Mensajes</div>
     <div id="cards-container" class="cards-container"></div>
-
-    <div id="bottom-bar" class="bottom-bar">
-      <div class="profile-section">
-        <div id="profile-img" class="profile-img"></div>
-        <span class="profile-text">Editar perfil</span>
-      </div>
+    
     </div>
   `;
 
-  document.getElementById("bottom-bar")
-    .addEventListener("click", () => navigate("profile"));
-
-  await loadProfile();
   await loadCards();
 }
 
@@ -136,33 +130,9 @@ async function loadCards() {
     card.appendChild(textContainer);
 
     card.addEventListener("click", () => {
-  navigate("chat", { userId: p.userId });
-});
+      navigate("chat", { userId: p.userId });
+    });
+
     container.appendChild(card);
   });
-}
-
-/* ===================== */
-/* 👤 PERFIL */
-/* ===================== */
-async function loadProfile() {
-  const userId = localStorage.getItem("user_id");
-
-  if (!userId) return;
-
-  const { data, error } = await supabase
-    .from("posts")
-    .select("imagenPerfil")
-    .eq("user_id", userId)
-    .limit(1);
-
-  if (error || !data || data.length === 0) return;
-
-  const imgDiv = document.getElementById("profile-img");
-  if (!imgDiv) return;
-
-  const imageUrl = data[0].imagenPerfil;
-  if (!imageUrl) return;
-
-  imgDiv.style.backgroundImage = `url(${imageUrl})`;
 }

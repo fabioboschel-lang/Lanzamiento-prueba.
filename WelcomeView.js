@@ -11,11 +11,11 @@ export function WelcomeView(app) {
         <h1 class="welcome-title">Tú eres</h1>
 
         <div class="welcome-grid two">
-          <button class="select-btn gender-btn" data-value="Hombre">
+          <button class="select-btn gender-btn" data-value="H">
             Hombre
           </button>
 
-          <button class="select-btn gender-btn" data-value="Mujer">
+          <button class="select-btn gender-btn" data-value="M">
             Mujer
           </button>
         </div>
@@ -26,18 +26,18 @@ export function WelcomeView(app) {
 
         <div class="welcome-grid two">
 
-          <button class="select-btn target-btn" data-value="Hombres">
+          <button class="select-btn target-btn" data-value="H">
             Hombres
           </button>
 
-          <button class="select-btn target-btn" data-value="Mujeres">
+          <button class="select-btn target-btn" data-value="M">
             Mujeres
           </button>
 
         </div>
 
         <div class="welcome-grid one">
-          <button class="select-btn target-btn both-btn" data-value="Ambos">
+          <button class="select-btn target-btn both-btn" data-value="X">
             Ambos
           </button>
         </div>
@@ -73,7 +73,7 @@ export function WelcomeView(app) {
 
       btn.classList.add("active");
 
-      sexo = btn.dataset.value;
+      sexo = btn.dataset.value; // H o M
 
       validate();
     });
@@ -92,7 +92,7 @@ export function WelcomeView(app) {
 
       btn.classList.add("active");
 
-      orientacion = btn.dataset.value;
+      orientacion = btn.dataset.value; // H, M o X
 
       validate();
     });
@@ -130,7 +130,6 @@ export function WelcomeView(app) {
       const userId = crypto.randomUUID();
 
       localStorage.setItem("user_id", userId);
-
       localStorage.setItem("sexo", sexo);
       localStorage.setItem("orientacion", orientacion);
 
@@ -139,8 +138,8 @@ export function WelcomeView(app) {
         .upsert(
           {
             user_id: userId,
-            Sexo: sexo,
-            Orientacion: orientacion
+            Sexo: sexo,                 // H o M
+            Orientacion: orientacion   // H / M / X
           },
           {
             onConflict: "user_id"
